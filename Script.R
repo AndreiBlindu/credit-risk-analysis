@@ -207,6 +207,19 @@ gg <- gg + ylim(27.636311, 81.008797)
 gg <- gg + coord_map("lambert", lat0=27.636311, lat1=81.008797)
 gg
 
+# Show evolution of the MScore in time
+Years <- c(2015, 2016, 2017, 2018, 2019, 2020)
+MScores <- c(
+  sum(data1$MScore.2015),
+  sum(data1$MScore.2016),
+  sum(data1$MScore.2017),
+  sum(data1$MScore.2018),
+  sum(data1$MScore.2019),
+  sum(data1$MScore.2020)
+  )
+ggplot(data.frame(Years,MScores), aes(x=Years, y=MScores)) +
+  geom_line()
+
 # Use One-hot encoding for the Country column
 data1$Italy <- ifelse(data1$Country == "Italy", 1, 0)
 data1$France <- ifelse(data1$Country == "France", 1, 0)
