@@ -10,46 +10,57 @@ library(Hmisc)
 library(pastecs)
 library(corrplot)
 
-# Import and view dataset
-View(Complete_Data)
+#############################################################################
+# DATA LOADING
+#############################################################################
+
+# We have a xlsx file with multiple sheets so we have to join them into a single dataframe
+setwd("/Users/andreiblindu/Desktop/Università/Laurea Magistrale/Corsi/2° anno/1° semestre/Financial Data Science/Project/credit-risk-analysis/")
+getwd()
+multiplesheets <- function(fname) {
+  
+  # getting info about all excel sheets
+  sheets <- readxl::excel_sheets(fname)
+  tibble <- lapply(sheets, function(x) readxl::read_excel(fname, sheet = x))
+  data_frame <- lapply(tibble, as.data.frame)
+  
+  # assigning names to data frames
+  names(data_frame) <- sheets
+  
+  # print data frame
+  print(data_frame)
+}
+
+Complete_Data <- multiplesheets("Complete_Data.xlsx")
+
+Dataset <- rbind(Complete_Data$`1-20k`, Complete_Data$`20k-40k`)
+Dataset <- rbind(Dataset, Complete_Data$`40k-60k`)
+Dataset <- rbind(Dataset, Complete_Data$`60k-80k`)
+Dataset <- rbind(Dataset, Complete_Data$`80k-100k`)
+Dataset <- rbind(Dataset, Complete_Data$`100k-121k`)
+
+# View dataset
+View(Dataset)
 # View summary and column names
-summary(Complete_Data)
-colnames(Complete_Data)
+summary(Dataset)
+colnames(Dataset)
 
 #############################################################################
 # DATA PRE-PROCESSING
 #############################################################################
 
-# Consider Turnover, EBIT, PLTax, Leverage, ROE and TAsset only for year 2019 
-# in order to predict MScore (response) for 2020
+# All features
 feature_list <- c('Company name', 
-                  'Turnover.2019', 
-                  'EBIT.2019', 
-                  'PLTax.2019', 
-                  'Region', 
-                  'Country', 
-                  'NACE code',
-                  'Sector 1',
-                  'Sector 2',
-                  'Leverage.2019', 
-                  'ROE.2019', 
-                  'TAsset.2019', 
-                  'MScore.2020')
-
-feature_list <- c('Company name', 
-                  'Turnover.2020',
                   'Turnover.2019', 
                   'Turnover.2018',
                   'Turnover.2017',
                   'Turnover.2016',
                   'Turnover.2015',
-                  'EBIT.2020',
                   'EBIT.2019', 
                   'EBIT.2018',
                   'EBIT.2017',
                   'EBIT.2016', 
                   'EBIT.2015',
-                  'PLTax.2020',
                   'PLTax.2019',
                   'PLTax.2018',
                   'PLTax.2017',
@@ -60,19 +71,16 @@ feature_list <- c('Company name',
                   'NACE code',
                   'Sector 1',
                   'Sector 2',
-                  'Leverage.2020',
                   'Leverage.2019',
                   'Leverage.2018',
                   'Leverage.2017',
                   'Leverage.2016',
                   'Leverage.2015',
-                  'ROE.2020',
                   'ROE.2019',
                   'ROE.2018',
                   'ROE.2017',
                   'ROE.2016',
                   'ROE.2015',
-                  'TAsset.2020',
                   'TAsset.2019',
                   'TAsset.2018',
                   'TAsset.2017',
@@ -84,14 +92,39 @@ feature_list <- c('Company name',
                   'MScore.2017',
                   'MScore.2016',
                   'MScore.2015'
-                  )
+)
 
-feature_list <- c('Company name', 
-                  'Region', 
-                  'Country', 
-                  'NACE code',
-                  'Sector 1',
-                  'Sector 2',
+# Only significant features
+feature_list <- c('Turnover.2019', 
+                  'Turnover.2018',
+                  'Turnover.2017',
+                  'Turnover.2016',
+                  'Turnover.2015',
+                  'EBIT.2019', 
+                  'EBIT.2018',
+                  'EBIT.2017',
+                  'EBIT.2016', 
+                  'EBIT.2015',
+                  'PLTax.2019',
+                  'PLTax.2018',
+                  'PLTax.2017',
+                  'PLTax.2016',
+                  'PLTax.2015',
+                  'Leverage.2019',
+                  'Leverage.2018',
+                  'Leverage.2017',
+                  'Leverage.2016',
+                  'Leverage.2015',
+                  'ROE.2019',
+                  'ROE.2018',
+                  'ROE.2017',
+                  'ROE.2016',
+                  'ROE.2015',
+                  'TAsset.2019',
+                  'TAsset.2018',
+                  'TAsset.2017',
+                  'TAsset.2016',
+                  'TAsset.2015',
                   'MScore.2020',
                   'MScore.2019',
                   'MScore.2018',
@@ -100,8 +133,32 @@ feature_list <- c('Company name',
                   'MScore.2015'
 )
 
+# Consider Turnover, EBIT, PLTax, Leverage, ROE and TAsset only for year 2019 
+# in order to predict MScore (response) for 2020
+feature_list <- c( 'Turnover.2019', 
+                  'EBIT.2019', 
+                  'PLTax.2019', 
+                  #'Region', 
+                  #'Country', 
+                  #'NACE code',
+                  #'Sector 1',
+                  #'Sector 2',
+                  'Leverage.2019', 
+                  'ROE.2019', 
+                  'TAsset.2019',
+                  'MScore.2019',
+                  'MScore.2020')
+
+feature_list <- c('MScore.2020',
+                  'MScore.2019'
+                  #'MScore.2018',
+                  #'MScore.2017',
+                  #'MScore.2016',
+                  #'MScore.2015'
+)
+
 # Remove missing values with na.omit
-data <- na.omit(Complete_Data[feature_list])
+data <- na.omit(Dataset[feature_list])
 colnames(data)
 summary(data)
 
@@ -125,6 +182,30 @@ data1$MScore.2015 <- ifelse(data$MScore.2015 >= "C", 1, 0)
 hist(data1$MScore.2020)
 table(data1$MScore.2020)
 prop.table(table(data1$MScore.2020))
+
+# Show a Map with the distribution of credit risk across the different countries
+country_score_count <- table(data1$Country, data1$MScore.2020)
+country_score_count
+france_ratio <- country_score_count[1,2] / (country_score_count[1,1] + country_score_count[1,2])  
+germany_ratio <- country_score_count[2,2] / (country_score_count[2,1] + country_score_count[2,2])  
+italy_ratio <- country_score_count[3,2] / (country_score_count[3,1] + country_score_count[3,2])  
+spain_ratio <- country_score_count[4,2] / (country_score_count[4,1] + country_score_count[4,2])  
+#https://stackoverflow.com/questions/30076553/r-choropleth-maps-choroplethr-package
+#https://stackoverflow.com/questions/58961926/how-to-select-specific-countries-to-make-a-choropleth-map
+#install.packages("choroplethr")
+#install.packages("choroplethrMaps")
+library(choroplethr)
+library(choroplethrMaps)
+library(ggplot2)
+
+data_iso = data.frame(region=c("italy", "germany", "france", "spain"),
+                      value = c(italy_ratio, germany_ratio, france_ratio, spain_ratio))
+
+gg <- country_choropleth(data_iso, legend="%",num_colors=1,zoom=data_iso$region)
+gg <- gg + xlim(-31.266001, 39.869301)
+gg <- gg + ylim(27.636311, 81.008797)
+gg <- gg + coord_map("lambert", lat0=27.636311, lat1=81.008797)
+gg
 
 # Use One-hot encoding for the Country column
 data1$Italy <- ifelse(data1$Country == "Italy", 1, 0)
@@ -203,6 +284,21 @@ colnames(data1)
 df <- data1[, !names(data1) %in% c("Company name", "Region", "Sector 1", "Sector 2",
                                    "Country", "NACE code")]
 colnames(df)
+
+# Normalize our data (only columns about Turnover, EBIT, PLTax, Leverage, ROE and TAsset)
+# We apply min-max normalization to make them be between 0 and 1
+for (col in colnames(df)) {
+  if (startsWith(col, "Turnover") | 
+      startsWith(col, "EBIT") |
+      startsWith(col, "PLTax") |
+      startsWith(col, "Leverage") |
+      startsWith(col, "ROE") |
+      startsWith(col, "TAsset")) 
+    {
+      df[col] = (df[col] - min(df[col])) / (max(df[col]) - min(df[col]))
+      print(summary(df[col]))
+    }
+}
 
 #############################################################################
 # CORRELATIONS
@@ -334,20 +430,6 @@ exp(coefficients(fit_full))
 
 ## Evaluate model
 evaluate_model(fit_full, df)
-
-# REDUCED MODEL
-## Let's now consider the model fitted on only the most significant variables
-## that from the summary of the full model are:
-## Turnover.2019; EBIT.2019; PLTax.2019; TAsset.2019; 
-fit_r <- glm(MScore.2020 ~ Turnover.2019 + EBIT.2019 + PLTax.2019 + TAsset.2019, 
-             data=df.train, family=binomial())
-summary(fit_r)
-
-## Odds ratios 
-exp(coefficients(fit_r))
-
-## Evaluate model
-evaluate_model(fit_r, df)
 
 
 #############################################################################
