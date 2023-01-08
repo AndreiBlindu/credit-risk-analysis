@@ -336,7 +336,9 @@ library(ppcor)
 #?pcor
 
 partial_correlations <- pcor(df, method = "spearman")
-partial_correlations
+rownames(partial_correlations$estimate) <- colnames(df)
+colnames(partial_correlations$estimate) <- colnames(df)
+partial_correlations$estimate
 
 # Visualize the partial correlation plot
 corrplot(partial_correlations$estimate, method = "square")
