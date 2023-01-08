@@ -22,9 +22,9 @@ I considered the MScore as the response variable that I wanted to predict and ex
 As part of the pre-processing this variable was binarized considering the values from level A to B as low level of risk (value 0) and the values from C to D as high level of risk (value 1).
 
 ## Analysis steps and code
-At first, with the code in Script.R I've performed some pre-processing, an exploratory analysis and tested some machine learning models on different sets of features in order to gain some insights from my data. 
+At first, with the code in [Script.R](https://github.com/AndreiBlindu/credit-risk-analysis/blob/main/Script.R) I've performed some pre-processing, an exploratory analysis and tested some machine learning models on different sets of features in order to gain some insights from my data. 
 
-Then I came up with the idea of building models that predict the MScore of a generic year (MScore_Curr) based on the company attributes (NACE, Country ...) and metrics of the previous year. The code implementation for this analysis can be found in the Scripton.R file.
+Then I came up with the idea of building models that predict the MScore of a generic year (MScore_Curr) based on the company attributes (NACE, Country ...) and metrics of the previous year. The code implementation for this analysis can be found in the [Scripton.R](https://github.com/AndreiBlindu/credit-risk-analysis/blob/main/Scripton.R) file.
 
 ## Presentation
 The presentation for this project can be found [here](https://www.canva.com/design/DAFWsXvUJS8/8uQ4A2cNgiZu-38-Y3djIQ/view?utm_content=DAFWsXvUJS8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
